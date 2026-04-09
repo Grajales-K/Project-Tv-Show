@@ -2,21 +2,32 @@
 function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
+
+}
+
+function tranformSeasonAndEpisodeNum(episode){
+  const {season, number} = episode;
+
+  const paddedSeason = season.toString().padStart(2, "0");
+  const paddedEpisode = number.toString().padStart(2, "0");
+
+  return `S${paddedSeason}E${paddedEpisode}`;
+
 }
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
    episodeList.forEach((episodes) => {
-    const paragraph = document.createElement("h2");
-    paragraph.textContent = ` ${episodes.name} S0${episodes.season}E0${episodes.number}`
-    rootElem.appendChild(paragraph);
+    const titleEpisodes = document.createElement("h2");
+    titleEpisodes.textContent = `${makeSeasonAndEpisodes(episodes)}: ${episodes.name}`;
+    rootElem.appendChild(titleEpisodes);
 
     const image = document.createElement("img");
     image.src = episodes.image.medium;
     rootElem.appendChild(image)
 
     const summaryText = document.createElement("p");
-    summaryText.textContent = episodes.summary;
+    summaryText.innerHTML = episodes.summary;
     rootElem.appendChild(summaryText);
   })
 }
