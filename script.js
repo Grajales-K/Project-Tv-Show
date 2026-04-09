@@ -6,7 +6,19 @@ function setup() {
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
-  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+   episodeList.forEach((episodes) => {
+    const paragraph = document.createElement("h2");
+    paragraph.textContent = ` ${episodes.name} S0${episodes.season}E0${episodes.number}`
+    rootElem.appendChild(paragraph);
+
+    const image = document.createElement("img");
+    image.src = episodes.image.medium;
+    rootElem.appendChild(image)
+
+    const summaryText = document.createElement("p");
+    summaryText.textContent = episodes.summary;
+    rootElem.appendChild(summaryText);
+  })
 }
 
 window.onload = setup;
