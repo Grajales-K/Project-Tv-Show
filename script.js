@@ -3,6 +3,20 @@ function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
 
+  //add feature/search
+  const searchInput = document.getElementById("searchInput");
+
+  searchInput.addEventListener("input", (event) => {
+    const searchString = event.target.value.toLowerCase();
+
+    const filteredEpisodes = allEpisodes.filter((episode) => {
+      return (
+        episode.summary.toLowerCase().includes(searchString) ||
+        episode.name.toLowerCase().includes(searchString)
+      );
+    });
+    makePageForEpisodes(filteredEpisodes);
+  });
 }
 
 function transformSeasonAndEpisodeNum(episode) {
@@ -16,6 +30,7 @@ function transformSeasonAndEpisodeNum(episode) {
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "";
    episodeList.forEach((episodes) => {
     const titleEpisodes = document.createElement("h2");
     titleEpisodes.textContent = `${transformSeasonAndEpisodeNum(episodes)}: ${
