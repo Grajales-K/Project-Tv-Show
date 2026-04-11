@@ -5,21 +5,22 @@ function setup() {
 
 }
 
-function tranformSeasonAndEpisodeNum(episode){
-  const {season, number} = episode;
+function transformSeasonAndEpisodeNum(episode) {
+  const { season, number } = episode;
 
-  const paddedSeason = season.toString().padStart(2, "0");
-  const paddedEpisode = number.toString().padStart(2, "0");
+  const paddedSeason = season.toString().padStart(2, '0');
+  const paddedEpisode = number.toString().padStart(2, '0');
 
   return `S${paddedSeason}E${paddedEpisode}`;
-
 }
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
    episodeList.forEach((episodes) => {
     const titleEpisodes = document.createElement("h2");
-    titleEpisodes.textContent = `${makeSeasonAndEpisodes(episodes)}: ${episodes.name}`;
+    titleEpisodes.textContent = `${transformSeasonAndEpisodeNum(episodes)}: ${
+      episodes.name
+    }`;
     rootElem.appendChild(titleEpisodes);
 
     const image = document.createElement("img");
