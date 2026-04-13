@@ -3,6 +3,29 @@
 }
 
 
-body{
+body {
   background-color: rgb(189, 190, 205);
+  font-family: Arial, sans-serif;
+  padding: 20px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+#searchInput,
+#episodeSelector {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  font-size: 16px;
+}
+
+#searchInput,
+#episodeSelector,
+label[for="searchInput"],
+label[for="episodeSelector"] {
+  display: block;
+  text-align: center;
 }
