@@ -3,7 +3,7 @@ function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
 
-  // -----ADD FEATURE/SEARCH by ANGELA 
+  // -----ADD FEATURE/SEARCH by ANGELA
   //get the search input field from the HTML page
   const searchInput = document.getElementById("searchInput");
   // listen for typing inside the search box
@@ -21,9 +21,13 @@ function setup() {
     });
     // get the element for episode count from HTML
     const countElement = document.getElementById("episodeCount");
-    // change the text in that element and show how many episodes matched the search against the total number of episodes
+   if (searchString.length > 0) {
+          // change the text in that element and show how many episodes matched the search against the total number of episodes
     countElement.textContent = `Showing: ${filteredEpisodes.length} / ${allEpisodes.length} episode(s)`;
-
+  } else {
+    
+    countElement.textContent = "";
+  }
     makePageForEpisodes(filteredEpisodes);
   });
 
@@ -38,8 +42,10 @@ function setup() {
     const selectedValue = event.target.value;
     // turn the string into a number
     const selectedId = parseInt(selectedValue, 10);
-    // only continue if the user picked something
+    //clear search input
     searchInput.value = "";
+    searchInput.dispatchEvent(new Event("input")); 
+    // only continue if the user picked something
     if (selectedId > 0) {
       // search for the episode
       let selectedEpisode = null;
