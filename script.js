@@ -38,8 +38,8 @@ function setup() {
     const selectedValue = event.target.value;
     // turn the string into a number
     const selectedId = parseInt(selectedValue, 10);
-    console.log(selectedId);
     // only continue if the user picked something
+    searchInput.value = "";
     if (selectedId > 0) {
       // search for the episode
       let selectedEpisode = null;
