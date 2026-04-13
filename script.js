@@ -21,8 +21,8 @@ function setup() {
     });
     // get the element for episode count from HTML
     const countElement = document.getElementById("episodeCount");
-    // change the text in that element and show how many episodes matched the search
-    countElement.textContent = "Showing " + filteredEpisodes.length + " episode(s)";
+    // change the text in that element and show how many episodes matched the search against the total number of episodes
+    countElement.textContent = `Showing: ${filteredEpisodes.length} / ${allEpisodes.length} episode(s)`;
 
     makePageForEpisodes(filteredEpisodes);
   });
