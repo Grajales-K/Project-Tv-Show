@@ -19,6 +19,11 @@ function setup() {
         episode.name.toLowerCase().includes(searchString)
       );
     });
+    // get the element for episode count from HTML
+    const countElement = document.getElementById("episodeCount");
+    // change the text in that element and show how many episodes matched the search
+    countElement.textContent = "Showing " + filteredEpisodes.length + " episode(s)";
+
     makePageForEpisodes(filteredEpisodes);
   });
 
@@ -48,7 +53,6 @@ function setup() {
         }
       }
       makePageForEpisodes([selectedEpisode]);
-      //Return all episode not working??
     } else {
       // If the user picked "Show all episodes"
       makePageForEpisodes(allEpisodes);
