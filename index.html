@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,6 +9,16 @@
   </head>
 
   <body>
+    <!-- insert input bar-->
+    <label for="searchInput">Search</label>
+    <input type="text" id="searchInput" placeholder="Search Shows" />
+    <p id="episodeCount"></p>
+
+    <label for="episodeSelector">Select by Episode</label>
+    <select id="episodeSelector">
+      <option value="">All Episodes</option>
+    </select>
+
     <div id="root"></div>
 
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
