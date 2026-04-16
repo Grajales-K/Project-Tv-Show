@@ -41,7 +41,9 @@ async function setup() {
       rootElem
     );
     populateShowSelector(allShows, showSelector);
-    // rootElem.innerHTML = "<p>Select a show to begin</p>";
+    setupShowSelector(showSelector, rootElem, searchInput, episodeSelector, countElement);
+    
+    rootElem.innerHTML = "<p>Select a show to begin</p>";
   } catch (error) {
     rootElem.innerHTML =
       '<p>Error loading episodes. Please try again later.</p>';
@@ -50,7 +52,19 @@ async function setup() {
   }
 }
 
-//fetch all shows
+function setupShowSelector(showSelector, rootElem, searchInput, episodeSelector, countElement) {
+  showSelector.addEventListener('change', (event) => {
+    const showId = parseInt(event.target.value, 10);
+
+    console.log("User selected show:", showId);
+
+    // Later we will load episodes here
+    // loadEpisodesForShow(showId, rootElem, searchInput, episodeSelector, countElement);
+  });
+}
+
+
+//fetch all shows by ANGELA
 async function fetchAllShows() {
   const url = 'https://api.tvmaze.com/shows';
 
