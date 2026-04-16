@@ -111,15 +111,15 @@ body {
 
 .grid-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2.5rem; /* Increased gap for better floating effect visibility */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem; 
 }
 
 /* --- Episode Card (The "Floating" effect) --- */
 .episode-card {
   background-color: var(--card-bg);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   display: flex;
@@ -135,10 +135,10 @@ body {
 }
 
 .episode-card h2 {
-  font-size: 1.1rem;
-  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  margin: 0 0 0.8rem 0;
   color: var(--primary-color);
-  min-height: 2.3rem;
+  min-height: 2.5rem;
   display: flex;
   align-items: center;
 }
