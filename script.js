@@ -1,39 +1,48 @@
 /**
  * 1. MAIN SETUP
- * The brain of the application. It captures DOM elements once
- * and distributes them to the specific features.
+ * Fetches all shows first and initializes the show dropdown.
  */
 async function setup() {
   const url = 'https://api.tvmaze.com/shows/82/episodes';
 
-    try {
-      //fetch data from the API
-      const response = await fetch(url);
+  // Capture DOM Elements
+  const rootElem = document.getElementById('content-grid');
+  const searchInput = document.getElementById('searchInput');
+  const episodeSelector = document.getElementById('episodeSelector');
+  const countElement = document.getElementById('episodeCount');
 
-      // Convert the response to JSON (a format JS understands)
-      const allEpisodes = await response.json();
+  if (!rootElem) return;
 
-      // Capture DOM Elements
-      const rootElem = document.getElementById('content-grid');
-      const searchInput = document.getElementById('searchInput');
-      const episodeSelector = document.getElementById('episodeSelector');
-      const countElement = document.getElementById('episodeCount');
+  rootElem.innerHTML =
+    "<p class='loading'>Loading episodes, please wait...</p>";
 
-      if (!rootElem) return;
+  try {
+    //fetch data from the API
+    const response = await fetch(url);
 
-      // Initial render and features
-      makePageForEpisodes(allEpisodes, rootElem);
-      updateCount(allEpisodes.length, allEpisodes.length, countElement);
-      setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
-      setupSelectorFeature(allEpisodes, episodeSelector, searchInput, countElement, rootElem);
+    // Convert the response to JSON (a format JS understands)
+    const allEpisodes = await response.json();
 
-} catch (error) {
+    // Initial render and features
+    makePageForEpisodes(allEpisodes, rootElem);
+    updateCount(allEpisodes.length, allEpisodes.length, countElement);
+
+    // We pass the data to these functions so they work locally
+    setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
+    setupSelectorFeature(
+      allEpisodes,
+      episodeSelector,
+      searchInput,
+      countElement,
+      rootElem
+    );
+  } catch (error) {
+    rootElem.innerHTML =
+      '<p>Error loading episodes. Please try again later.</p>';
     // If something goes wrong (no internet, server down), we show an error
-    console.error("Error fetching episodes:", error);
+    console.error('Error fetching episodes:', error);
   }
 }
-
-
 
 /**
  * 2. SEARCH FEATURE
@@ -103,13 +112,11 @@ function makePageForEpisodes(episodeList, rootElem) {
     const titleText = `${seasonAndEpisode} - ${episode.name}`;
 
     const episodeCard = document.createElement('section');
-    episodeCard.className = 'episode-card'; // Linked to our CSS styles
+    episodeCard.className = 'episode-card';
 
     episodeCard.innerHTML = `
       <h2>${titleText}</h2>
-      <img src="${episode.image ? episode.image.medium : ''}" alt="${
-      episode.name
-    }">
+      <img src="${episode.image ? episode.image.medium : ''}" alt="${episode.name}">
       ${episode.summary}
     `;
 
@@ -131,12 +138,13 @@ function updateCount(displayed, total, countElement) {
 
 // Populates the <select> element with options
 function populateEpisodeSelector(episodes, selectorElement) {
+  // Clear any existing options (except the first one)
+  selectorElement.innerHTML = '<option value="0">All Episodes</option>';
+  
   episodes.forEach((episode) => {
     const option = document.createElement('option');
     option.value = episode.id;
-    option.textContent = `${transformSeasonAndEpisodeNum(episode)} - ${
-      episode.name
-    }`;
+    option.textContent = `${transformSeasonAndEpisodeNum(episode)} - ${episode.name}`;
     selectorElement.appendChild(option);
   });
 }
@@ -147,6 +155,5 @@ function transformSeasonAndEpisodeNum(episode) {
   const paddedEpisode = episode.number.toString().padStart(2, '0');
   return `S${paddedSeason}E${paddedEpisode}`;
 }
-
 
 window.onload = setup;
