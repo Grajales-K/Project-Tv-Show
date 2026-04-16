@@ -222,8 +222,6 @@ async function loadEpisodesForShow(
 
     makePageForEpisodes(allEpisodes, rootElem);
     updateCount(allEpisodes.length, allEpisodes.length, countElement);
-    // reset episode drop down by Angela
-    // episodeSelector.innerHTML = '<option value="0">All Episodes</option>';
     // Clear old listeners
     searchInput.oninput = null;
     episodeSelector.onchange = null;
