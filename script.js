@@ -3,46 +3,26 @@
  * Fetches all shows first and initializes the show dropdown.
  */
 async function setup() {
-  const url = "https://api.tvmaze.com/shows/82/episodes";
-
   // Capture DOM Elements
   const rootElem = document.getElementById("content-grid");
   const searchInput = document.getElementById("searchInput");
   const episodeSelector = document.getElementById("episodeSelector");
   const countElement = document.getElementById("episodeCount");
-  const allShows = await fetchAllShows();
-  // console.log("fetched shows", allShows);
-  // rootElem.innerHTML = "<p>cShows loaded?</p>";
   const showSelector = document.getElementById("showSelector");
   // Clear any leftover handlers from previous runs by ANGELA
   searchInput.oninput = null;
   episodeSelector.onchange = null;
+
   if (!rootElem) return;
 
   rootElem.innerHTML =
-    "<p class='loading'>Loading episodes, please wait...</p>";
+    "<p>Select a show to begin...</p>";
+  
+    //fetch all shows
+    const allShows = await fetchAllShows(); 
 
-  try {
-    //fetch data from the API
-    const response = await fetch(url);
-
-    // Convert the response to JSON (a format JS understands)
-    const allEpisodes = await response.json();
-    //by ANGELA remove for now to fix the double render
-    // Initial render and features
-    // makePageForEpisodes(allEpisodes, rootElem);
-    // updateCount(allEpisodes.length, allEpisodes.length, countElement);
-
-    // We pass the data to these functions so they work locally
-    setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
-    setupSelectorFeature(
-      allEpisodes,
-      episodeSelector,
-      searchInput,
-      countElement,
-      rootElem,
-    );
-    populateShowSelector(allShows, showSelector);
+    // populate the show dropdown menu
+  populateShowSelector(allShows, showSelector);
     setupShowSelector(
       showSelector,
       rootElem,
@@ -50,15 +30,7 @@ async function setup() {
       episodeSelector,
       countElement,
     );
-
-    rootElem.innerHTML = "<p>Select a show to begin</p>";
-  } catch (error) {
-    rootElem.innerHTML =
-      "<p>Error loading episodes. Please try again later.</p>";
-    // If something goes wrong (no internet, server down), we show an error
-    console.error("Error fetching episodes:", error);
   }
-}
 
 function setupShowSelector(
   showSelector,
@@ -255,7 +227,7 @@ async function loadEpisodesForShow(
     // Clear old listeners
     searchInput.oninput = null;
     episodeSelector.onchange = null;
-
+    //refresh
     setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
     setupSelectorFeature(
       allEpisodes,
@@ -266,7 +238,7 @@ async function loadEpisodesForShow(
     );
   } catch (error) {
     console.error("Error fetching episodes:", error);
-    rootElem.innerHTML = "<p>Could not load episodes. Please try again.</p>";
+    rootElem.innerHTML = "<p>Failed load episodes. Please try again.</p>";
   }
 }
 
