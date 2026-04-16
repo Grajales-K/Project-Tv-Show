@@ -100,14 +100,17 @@ async function fetchAllShows() {
  */
 function setupSearchFeature(allEpisodes, searchInput, countElement, rootElem) {
   if (!searchInput) return;
-//update displaying numbers
+  //update displaying numbers
   searchInput.oninput = (event) => {
     const searchString = event.target.value.toLowerCase();
 
     const filteredEpisodes = allEpisodes.filter((episode) => {
+      const summary = episode.summary || "";
+      const name = episode.name || "";
+
       return (
-        episode.summary.toLowerCase().includes(searchString) ||
-        episode.name.toLowerCase().includes(searchString)
+        summary.toLowerCase().includes(searchString) ||
+        name.toLowerCase().includes(searchString)
       );
     });
 
@@ -245,8 +248,8 @@ async function loadEpisodesForShow(
 
     makePageForEpisodes(allEpisodes, rootElem);
     updateCount(allEpisodes.length, allEpisodes.length, countElement);
-    // reset episode drop down
-    episodeSelector.innerHTML = '<option value="0">All Episodes</option>';
+    // reset episode drop down by Angela
+    // episodeSelector.innerHTML = '<option value="0">All Episodes</option>';
 
     setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
     setupSelectorFeature(
