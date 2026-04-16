@@ -14,7 +14,9 @@ async function setup() {
   // console.log("fetched shows", allShows);
   // rootElem.innerHTML = "<p>cShows loaded?</p>";
   const showSelector = document.getElementById("showSelector");
-
+  // Clear any leftover handlers from previous runs by ANGELA
+  searchInput.oninput = null;
+  episodeSelector.onchange = null;
   if (!rootElem) return;
 
   rootElem.innerHTML =
@@ -250,6 +252,9 @@ async function loadEpisodesForShow(
     updateCount(allEpisodes.length, allEpisodes.length, countElement);
     // reset episode drop down by Angela
     // episodeSelector.innerHTML = '<option value="0">All Episodes</option>';
+    // Clear old listeners
+    searchInput.oninput = null;
+    episodeSelector.onchange = null;
 
     setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
     setupSelectorFeature(
