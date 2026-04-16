@@ -10,6 +10,9 @@ async function setup() {
   const searchInput = document.getElementById('searchInput');
   const episodeSelector = document.getElementById('episodeSelector');
   const countElement = document.getElementById('episodeCount');
+  const allShows = await fetchAllShows();
+  // console.log("fetched shows", allShows);
+  // rootElem.innerHTML = "<p>cShows loaded?</p>";
 
   if (!rootElem) return;
 
@@ -43,6 +46,21 @@ async function setup() {
     console.error('Error fetching episodes:', error);
   }
 }
+
+//fetch all shows
+async function fetchAllShows() {
+  const url = 'https://api.tvmaze.com/shows';
+
+  try {
+    const response = await fetch(url);
+    const allShows = await response.json();
+    return allShows;
+  } catch (error) {
+    console.error('Error fetching shows:', error);
+    return [];
+  }
+}
+
 
 /**
  * 2. SEARCH FEATURE
