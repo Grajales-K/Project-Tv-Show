@@ -15,21 +15,25 @@
       <h1>TV Maze Explorer</h1>
       <p id="episodeCount"></p>
     </div>
-    <!-- insert input bar-->
-    <label for="searchInput">Search</label>
-    <input type="text" id="searchInput" placeholder="Search Shows" />
-    <p id="episodeCount"></p>
+    <nav class="controls-container">
 
-    <label for="episodeSelector">Select by Episode</label>
-    <select id="episodeSelector">
-      <option value="">All Episodes</option>
-    </select>
+      <div class="control-group search-wrapper">
+        <div class="control-group search-wrapper">
+          <label for="searchInput">Search</label>
+          <input type="text" id="searchInput" class="select" placeholder="Search episodes..." />
+        </div>
 
-    
+        <div id="episode-filter-group" class="control-group">
+          <label for="episodeSelector">Select by Episode:</label>
+          <select id="episodeSelector" class="select">
+            <option value="">All Episodes</option>
+          </select>
+        </div>
+      </div>
     </nav>
   </header>
   <main id="root">
-    
+
   </main>
   <footer class="main-footer">
     <p>
