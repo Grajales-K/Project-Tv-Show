@@ -1,115 +1,152 @@
-//You can edit ALL of the code here
+/**
+ * 1. MAIN SETUP
+ * The brain of the application. It captures DOM elements once
+ * and distributes them to the specific features.
+ */
 function setup() {
   const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
 
-  // -----ADD FEATURE/SEARCH by ANGELA
-  //get the search input field from the HTML page
-  const searchInput = document.getElementById("searchInput");
-  // listen for typing inside the search box
-  searchInput.addEventListener("input", (event) => {
-    //take what the user inputs and convert it to lowercase so it can take any case type inputted
+  // Capture DOM Elements
+  const rootElem = document.getElementById('content-grid');
+  const searchInput = document.getElementById('searchInput');
+  const episodeSelector = document.getElementById('episodeSelector');
+  const countElement = document.getElementById('episodeCount');
+
+  // Security check
+  if (!rootElem) {
+    console.error("Target container 'content-grid' not found in HTML");
+    return;
+  }
+
+  // Initial render: Load all episodes immediately
+  makePageForEpisodes(allEpisodes, rootElem);
+
+  // Initial count: Show "Showing 73/73" on page load
+  updateCount(allEpisodes.length, allEpisodes.length, countElement);
+
+  // Initialize features
+  setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
+  setupSelectorFeature(
+    allEpisodes,
+    episodeSelector,
+    searchInput,
+    countElement,
+    rootElem
+  );
+}
+
+/**
+ * 2. SEARCH FEATURE
+ * Handles filtering when the user types in the search box.
+ */
+function setupSearchFeature(allEpisodes, searchInput, countElement, rootElem) {
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', (event) => {
     const searchString = event.target.value.toLowerCase();
-    //filter through the full list of episodes based on the search
+
     const filteredEpisodes = allEpisodes.filter((episode) => {
-      //check search against the episode name /the episode summary.
       return (
-        //return the results
         episode.summary.toLowerCase().includes(searchString) ||
         episode.name.toLowerCase().includes(searchString)
       );
     });
-    // get the element for episode count from HTML
-    const countElement = document.getElementById("episodeCount");
-   if (searchString.length > 0) {
-          // change the text in that element and show how many episodes matched the search against the total number of episodes
-    countElement.textContent = `Showing: ${filteredEpisodes.length} / ${allEpisodes.length} episode(s)`;
-  } else {
-    
-    countElement.textContent = "";
-  }
-    makePageForEpisodes(filteredEpisodes);
-  });
 
-  // -----ADD EPISODE SELECTOR by ANGELA-----//
-  // get the dropdown menu from the HTML page
-  const episodeSelector = document.getElementById("episodeSelector");
-  // fill the dropdown with all episodes
+    // Update numbers and cards
+    updateCount(filteredEpisodes.length, allEpisodes.length, countElement);
+    makePageForEpisodes(filteredEpisodes, rootElem);
+  });
+}
+
+/**
+ * 3. SELECTOR FEATURE
+ * Handles showing a single episode from the dropdown menu.
+ */
+function setupSelectorFeature(
+  allEpisodes,
+  episodeSelector,
+  searchInput,
+  countElement,
+  rootElem
+) {
+  if (!episodeSelector) return;
+
+  // Fill the dropdown options
   populateEpisodeSelector(allEpisodes, episodeSelector);
-  // when the user changes the selected episode
-  episodeSelector.addEventListener("change", function (event) {
-    // get the value from the dropdown
-    const selectedValue = event.target.value;
-    // turn the string into a number
-    const selectedId = parseInt(selectedValue, 10);
-    //clear search input
-    searchInput.value = "";
-    searchInput.dispatchEvent(new Event("input")); 
-    // only continue if the user picked something
+
+  episodeSelector.addEventListener('change', (event) => {
+    const selectedId = parseInt(event.target.value, 10);
+
+    // Reset search bar and counter when using the dropdown
+    if (searchInput) searchInput.value = '';
+
     if (selectedId > 0) {
-      // search for the episode
-      let selectedEpisode = null;
-      // iterate through all episodes so we can process/display each one
-      for (let i = 0; i < allEpisodes.length; i++) {
-        const episode = allEpisodes[i];
-        // If the episode's id matches the selected id, we found it stoop searching
-        if (episode.id === selectedId) {
-          selectedEpisode = episode;
-          break;
-        }
-      }
-      makePageForEpisodes([selectedEpisode]);
+      const selectedEpisode = allEpisodes.find((ep) => ep.id === selectedId);
+      makePageForEpisodes([selectedEpisode], rootElem);
+      updateCount(1, allEpisodes.length, countElement);
     } else {
-      // If the user picked "Show all episodes"
-      makePageForEpisodes(allEpisodes);
+      makePageForEpisodes(allEpisodes, rootElem);
+      updateCount(allEpisodes.length, allEpisodes.length, countElement);
     }
   });
 }
 
-// -----ADD EPISODE SELECTOR DROP DOWN MENU by ANGELA-----//
-function populateEpisodeSelector(episodes, selectorElement) {
-  // Loop through each episode in the list
-  for (let i = 0; i < episodes.length; i++) {
-    const episode = episodes[i];
-    // Create a new <option> element
-    const option = document.createElement("option");
-    // Set the value of the option (what gets submitted)
-    option.value = episode.id;
-    // Set the text that the user will see
-    const label = transformSeasonAndEpisodeNum(episode) + " - " + episode.name;
-    option.textContent = label;
-    // Add the option to the dropdown menu
-    selectorElement.appendChild(option);
+/**
+ * 4. RENDERING
+ * Responsible for creating the HTML "cards" for the episodes.
+ */
+function makePageForEpisodes(episodeList, rootElem) {
+  rootElem.innerHTML = ''; // Clear current episodes
+
+  episodeList.forEach((episode) => {
+    const seasonAndEpisode = transformSeasonAndEpisodeNum(episode);
+    const titleText = `${seasonAndEpisode} - ${episode.name}`;
+
+    const episodeCard = document.createElement('section');
+    episodeCard.className = 'episode-card'; // Linked to our CSS styles
+
+    episodeCard.innerHTML = `
+      <h2>${titleText}</h2>
+      <img src="${episode.image ? episode.image.medium : ''}" alt="${
+      episode.name
+    }">
+      ${episode.summary}
+    `;
+
+    rootElem.appendChild(episodeCard);
+  });
+}
+
+/**
+ * 5. HELPERS
+ * Small utility functions to keep the main logic readable.
+ */
+
+// Updates the "Showing X/Y" text
+function updateCount(displayed, total, countElement) {
+  if (countElement) {
+    countElement.textContent = `Showing: ${displayed} / ${total} episode(s)`;
   }
 }
 
+// Populates the <select> element with options
+function populateEpisodeSelector(episodes, selectorElement) {
+  episodes.forEach((episode) => {
+    const option = document.createElement('option');
+    option.value = episode.id;
+    option.textContent = `${transformSeasonAndEpisodeNum(episode)} - ${
+      episode.name
+    }`;
+    selectorElement.appendChild(option);
+  });
+}
+
+// Formats numbers to S01E01
 function transformSeasonAndEpisodeNum(episode) {
-  const { season, number } = episode;
-
-  const paddedSeason = season.toString().padStart(2, "0");
-  const paddedEpisode = number.toString().padStart(2, "0");
-
+  const paddedSeason = episode.season.toString().padStart(2, '0');
+  const paddedEpisode = episode.number.toString().padStart(2, '0');
   return `S${paddedSeason}E${paddedEpisode}`;
 }
 
-function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
-  rootElem.innerHTML = "";
-  episodeList.forEach((episodes) => {
-    const titleEpisodes = document.createElement("h2");
-    titleEpisodes.textContent = `${transformSeasonAndEpisodeNum(episodes)}: ${
-      episodes.name
-    }`;
-    rootElem.appendChild(titleEpisodes);
-
-    const image = document.createElement("img");
-    image.src = episodes.image.medium;
-    rootElem.appendChild(image);
-
-    const summaryText = document.createElement("p");
-    summaryText.innerHTML = episodes.summary;
-    rootElem.appendChild(summaryText);
-  });
-}
 
 window.onload = setup;
