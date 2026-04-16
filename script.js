@@ -3,37 +3,37 @@
  * The brain of the application. It captures DOM elements once
  * and distributes them to the specific features.
  */
-function setup() {
-  const allEpisodes = getAllEpisodes();
+async function setup() {
+  const url = 'https://api.tvmaze.com/shows/82/episodes';
 
-  // Capture DOM Elements
-  const rootElem = document.getElementById('content-grid');
-  const searchInput = document.getElementById('searchInput');
-  const episodeSelector = document.getElementById('episodeSelector');
-  const countElement = document.getElementById('episodeCount');
+    try {
+      //fetch data from the API
+      const response = await fetch(url);
 
-  // Security check
-  if (!rootElem) {
-    console.error("Target container 'content-grid' not found in HTML");
-    return;
+      // Convert the response to JSON (a format JS understands)
+      const allEpisodes = await response.json();
+
+      // Capture DOM Elements
+      const rootElem = document.getElementById('content-grid');
+      const searchInput = document.getElementById('searchInput');
+      const episodeSelector = document.getElementById('episodeSelector');
+      const countElement = document.getElementById('episodeCount');
+
+      if (!rootElem) return;
+
+      // Initial render and features
+      makePageForEpisodes(allEpisodes, rootElem);
+      updateCount(allEpisodes.length, allEpisodes.length, countElement);
+      setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
+      setupSelectorFeature(allEpisodes, episodeSelector, searchInput, countElement, rootElem);
+
+} catch (error) {
+    // If something goes wrong (no internet, server down), we show an error
+    console.error("Error fetching episodes:", error);
   }
-
-  // Initial render: Load all episodes immediately
-  makePageForEpisodes(allEpisodes, rootElem);
-
-  // Initial count: Show "Showing 73/73" on page load
-  updateCount(allEpisodes.length, allEpisodes.length, countElement);
-
-  // Initialize features
-  setupSearchFeature(allEpisodes, searchInput, countElement, rootElem);
-  setupSelectorFeature(
-    allEpisodes,
-    episodeSelector,
-    searchInput,
-    countElement,
-    rootElem
-  );
 }
+
+
 
 /**
  * 2. SEARCH FEATURE
