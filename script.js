@@ -13,6 +13,7 @@ async function setup() {
   const allShows = await fetchAllShows();
   // console.log("fetched shows", allShows);
   // rootElem.innerHTML = "<p>cShows loaded?</p>";
+  const showSelector = document.getElementById('showSelector');
 
   if (!rootElem) return;
 
@@ -39,6 +40,8 @@ async function setup() {
       countElement,
       rootElem
     );
+    populateShowSelector(allShows, showSelector);
+    // rootElem.innerHTML = "<p>Select a show to begin</p>";
   } catch (error) {
     rootElem.innerHTML =
       '<p>Error loading episodes. Please try again later.</p>';
@@ -153,6 +156,21 @@ function updateCount(displayed, total, countElement) {
     countElement.textContent = `Showing: ${displayed} / ${total} episode(s)`;
   }
 }
+//Populate the <select> shows with options by ANGELA
+function populateShowSelector(shows, selectorElement) {
+  selectorElement.innerHTML = '<option value="0">Select a show</option>';
+
+  // sort a-z
+  shows.sort((a, b) => a.name.localeCompare(b.name));
+
+  shows.forEach((show) => {
+    const option = document.createElement('option');
+    option.value = show.id;
+    option.textContent = show.name;
+    selectorElement.appendChild(option);
+  });
+}
+
 
 // Populates the <select> element with options
 function populateEpisodeSelector(episodes, selectorElement) {
