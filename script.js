@@ -1,45 +1,60 @@
+let allEpisodes;
+
 /**
- * 1. MAIN SETUP
+ * 1. orchestration
  * Fetches all shows first and initializes the show dropdown.
  */
 async function setup() {
   // Capture DOM Elements
-  const rootElem = document.getElementById("content-grid");
-  const searchInput = document.getElementById("searchInput");
-  const episodeSelector = document.getElementById("episodeSelector");
-  const countElement = document.getElementById("episodeCount");
-  const showSelector = document.getElementById("showSelector");
-  // Clear any leftover handlers from previous runs by ANGELA
-  searchInput.oninput = null;
-  episodeSelector.onchange = null;
+  const rootElem = document.getElementById('content-grid');
+  const searchInput = document.getElementById('searchInput');
+  const episodeSelector = document.getElementById('episodeSelector');
+  const countElement = document.getElementById('episodeCount');
+  const showSelector = document.getElementById('showSelector');
 
-  if (!rootElem) return;
-
-  rootElem.innerHTML =
-    "<p>Select a show to begin...</p>";
-  
-    //fetch all shows
-    const allShows = await fetchAllShows(); 
-
-    // populate the show dropdown menu
+  // load all shows and populate the show dropdown
+  const allShows = await fetchAllShows();
   populateShowSelector(allShows, showSelector);
-    setupShowSelector(
-      showSelector,
-      rootElem,
-      searchInput,
-      episodeSelector,
-      countElement,
-    );
-  }
+  rootElem.innerHTML = '<p>Select a show to begin...</p>';
+
+ 
+  searchInput.addEventListener('input', () => {
+    const filtered = filteredEpisodes(allEpisodes, searchInput.value);
+    makePageForEpisodes(filtered, rootElem);
+    updateCount(filtered.length, allEpisodes.length, countElement);
+  })
+
+  showSelector.addEventListener('change', async (event) => {
+    const showId = e.target.value;
+    if (showId > 0 ){
+      allEpisodes = await fetchEpisodes(showID);
+      makePageForEpisodes(allEpisodes, rootElem);
+      updateCount(allEpisodes.length, allEpisodes.length, countElement);
+    }
+  });
+
+  rootElem.innerHTML = '<p>Select a show to begin...</p>';
+
+
+  // // populate the show dropdown menu
+  // populateShowSelector(allShows, showSelector);
+  // setupShowSelector(
+  //   showSelector,
+  //   rootElem,
+  //   searchInput,
+  //   episodeSelector,
+  //   countElement
+  // );
+}
 
 function setupShowSelector(
   showSelector,
   rootElem,
   searchInput,
   episodeSelector,
-  countElement,
+  countElement
 ) {
-  showSelector.addEventListener("change", (event) => {
+  showSelector.addEventListener('change', (event) => {
     const showId = parseInt(event.target.value, 10);
 
     if (!showId) return;
@@ -49,21 +64,21 @@ function setupShowSelector(
       rootElem,
       searchInput,
       episodeSelector,
-      countElement,
+      countElement
     );
   });
 }
 
 //fetch all shows by ANGELA
 async function fetchAllShows() {
-  const url = "https://api.tvmaze.com/shows";
+  const url = 'https://api.tvmaze.com/shows';
 
   try {
     const response = await fetch(url);
     const allShows = await response.json();
     return allShows;
   } catch (error) {
-    console.error("Error fetching shows:", error);
+    console.error('Error fetching shows:', error);
     return [];
   }
 }
@@ -79,8 +94,8 @@ function setupSearchFeature(allEpisodes, searchInput, countElement, rootElem) {
     const searchString = event.target.value.toLowerCase();
 
     const filteredEpisodes = allEpisodes.filter((episode) => {
-      const summary = episode.summary || "";
-      const name = episode.name || "";
+      const summary = episode.summary || '';
+      const name = episode.name || '';
 
       return (
         summary.toLowerCase().includes(searchString) ||
@@ -103,7 +118,7 @@ function setupSelectorFeature(
   episodeSelector,
   searchInput,
   countElement,
-  rootElem,
+  rootElem
 ) {
   if (!episodeSelector) return;
 
@@ -114,7 +129,7 @@ function setupSelectorFeature(
     const selectedId = parseInt(event.target.value, 10);
 
     // Reset search bar and counter when using the dropdown
-    if (searchInput) searchInput.value = "";
+    if (searchInput) searchInput.value = '';
 
     if (selectedId > 0) {
       const selectedEpisode = allEpisodes.find((ep) => ep.id === selectedId);
@@ -139,18 +154,20 @@ function setupSelectorFeature(
  * Responsible for creating the HTML "cards" for the episodes.
  */
 function makePageForEpisodes(episodeList, rootElem) {
-  rootElem.innerHTML = ""; // Clear current episodes
+  rootElem.innerHTML = ''; // Clear current episodes
 
   episodeList.forEach((episode) => {
     const seasonAndEpisode = transformSeasonAndEpisodeNum(episode);
     const titleText = `${seasonAndEpisode} - ${episode.name}`;
 
-    const episodeCard = document.createElement("section");
-    episodeCard.className = "episode-card";
+    const episodeCard = document.createElement('section');
+    episodeCard.className = 'episode-card';
 
     episodeCard.innerHTML = `
       <h2>${titleText}</h2>
-      <img src="${episode.image ? episode.image.medium : ""}" alt="${episode.name}">
+      <img src="${episode.image ? episode.image.medium : ''}" alt="${
+      episode.name
+    }">
       ${episode.summary}
     `;
 
@@ -177,7 +194,7 @@ function populateShowSelector(shows, selectorElement) {
   shows.sort((a, b) => a.name.localeCompare(b.name));
 
   shows.forEach((show) => {
-    const option = document.createElement("option");
+    const option = document.createElement('option');
     option.value = show.id;
     option.textContent = show.name;
     selectorElement.appendChild(option);
@@ -190,17 +207,19 @@ function populateEpisodeSelector(episodes, selectorElement) {
   selectorElement.innerHTML = '<option value="0">All Episodes</option>';
 
   episodes.forEach((episode) => {
-    const option = document.createElement("option");
+    const option = document.createElement('option');
     option.value = episode.id;
-    option.textContent = `${transformSeasonAndEpisodeNum(episode)} - ${episode.name}`;
+    option.textContent = `${transformSeasonAndEpisodeNum(episode)} - ${
+      episode.name
+    }`;
     selectorElement.appendChild(option);
   });
 }
 
 // Formats numbers to S01E01
 function transformSeasonAndEpisodeNum(episode) {
-  const paddedSeason = episode.season.toString().padStart(2, "0");
-  const paddedEpisode = episode.number.toString().padStart(2, "0");
+  const paddedSeason = episode.season.toString().padStart(2, '0');
+  const paddedEpisode = episode.number.toString().padStart(2, '0');
   return `S${paddedSeason}E${paddedEpisode}`;
 }
 
@@ -210,13 +229,13 @@ async function loadEpisodesForShow(
   rootElem,
   searchInput,
   episodeSelector,
-  countElement,
+  countElement
 ) {
   rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
 
   try {
     const response = await fetch(
-      `https://api.tvmaze.com/shows/${showId}/episodes`,
+      `https://api.tvmaze.com/shows/${showId}/episodes`
     );
     const allEpisodes = await response.json();
 
@@ -232,12 +251,18 @@ async function loadEpisodesForShow(
       episodeSelector,
       searchInput,
       countElement,
-      rootElem,
+      rootElem
     );
   } catch (error) {
-    console.error("Error fetching episodes:", error);
-    rootElem.innerHTML = "<p>Failed load episodes. Please try again.</p>";
+    console.error('Error fetching episodes:', error);
+    rootElem.innerHTML = '<p>Failed load episodes. Please try again.</p>';
   }
 }
 
 window.onload = setup;
+
+
+
+//
+
+
