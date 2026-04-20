@@ -17,16 +17,17 @@ async function setup() {
   populateShowSelector(allShows, showSelector);
   rootElem.innerHTML = '<p>Select All Shows or One Show to begin...</p>';
 
- 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
-    const filtered = allEpisodes.filter(episode => episode.name.toLowerCase().includes(query) ||
-      (allEpisode.summary && allEpisode.summary.toLowerCase().includes(query))
-    )
+    const filtered = allEpisodes.filter(
+      (episode) =>
+        episode.name.toLowerCase().includes(query) ||
+        (allEpisode.summary && allEpisode.summary.toLowerCase().includes(query))
+    );
     makePageForEpisodes(filtered, rootElem);
     updateCount(filtered.length, allEpisodes.length, countElement);
-  })
-  
+  });
+
   showSelector.addEventListener('change', async (event) => {
     const showId = event.target.value;
 
@@ -36,8 +37,7 @@ async function setup() {
     }
 
     rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
-    searchInput.value = ""; // Clear search input on show change
-
+    searchInput.value = ''; // Clear search input on show change
 
     allEpisodes = await fetchEpisodes(showId);
 
@@ -49,12 +49,12 @@ async function setup() {
   episodeSelector.addEventListener('change', (event) => {
     const selectedId = parseInt(event.target.value);
 
-    if(selectedId === 0) {
+    if (selectedId === 0) {
       makePageForEpisodes(allEpisodes, rootElem);
       updateCount(allEpisodes.length, allEpisodes.length, countElement);
-    }else {
+    } else {
       const single = allEpisodes.filter((episode) => episode.id === selectedId);
-      makePageForEpisodes(single, rootElem);  
+      makePageForEpisodes(single, rootElem);
       updateCount(1, allEpisodes.length, countElement);
     }
   });
@@ -64,46 +64,83 @@ async function setup() {
  *  Data Functions (API)
  */
 
-async function fetchAllShows(){
-  try{
+async function fetchAllShows() {
+  try {
     const response = await fetch('https://api.tvmaze.com/shows');
-    if(!response.ok) throw new Error("Network response was not ok, please try again");
-    return await response.json(); 
-  }catch(error){
+    if (!response.ok)
+      throw new Error('Network response was not ok, please try again');
+    return await response.json();
+  } catch (error) {
     console.error('error fetching shows:', error);
     return [];
   }
 }
 
-async function fetchEpisodes(showId){
+async function fetchEpisodes(showId) {
   try {
-    const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
-    if (!response.ok) throw new Error("Network response did not downloaded episodes, please try again");
+    const response = await fetch(
+      `https://api.tvmaze.com/shows/${showId}/episodes`
+    );
+    if (!response.ok)
+      throw new Error(
+        'Network response did not downloaded episodes, please try again'
+      );
     return await response.json();
-  }catch(error) {
+  } catch (error) {
     console.error('Error fetching episodes:', error);
-    return []; 
+    return [];
   }
-  
 }
-
 
 /**
  *  Rendering Functions
  */
-function makePageForEpisodes(episodeList, rootElement){
+function makePageForShows(showList, rootElement) {
   rootElement.innerHTML = '';
 
-  if(episodeList.length === 0) {
+  showList.forEach((show) => {
+    const showCard = document.createElement('section');
+    showCard.classList.add('show-card');
+
+    const img = show.image
+      ? show.image.medium
+      : 'https://via.placeholder.com/210x295?text=No+Image';
+    const genres = show.genres ? show.genres.join(', ') : 'No genres available';
+
+    showCard.innerHTML = `
+      <h2>${show.name}</h2>
+      <img src="${img}" alt="${show.name}"> 
+
+      <div class="show-info">  
+        <strong>${genres}</strong> | ⭐ ${show.rating.average || 'N/A'}
+      </div>
+
+      <div class="summary">
+      ${show.summary || 'no summary avaliable.'}  
+      </div>
+
+      <div class="show-footer">
+        <span> Status: ${show.status}</span> | <span>${show.runtime}</span>
+      </div> `;
+    rootElement.appendChild(showCard);
+  });
+}
+
+function makePageForEpisodes(episodeList, rootElement) {
+  rootElement.innerHTML = '';
+
+  if (episodeList.length === 0) {
     rootElem.innerHTML = '<p>No episodes found matching your criteria.</p>';
   }
 
-  episodeList.forEach((episode) =>  {
+  episodeList.forEach((episode) => {
     const seasonAndEpisode = transformSeasonAndEpisodeNum(episode);
     const episodeCard = document.createElement('section');
     episodeCard.classList.add('episode-card');
-    
-    const img = episode.image ? episode.image.medium : 'https://via.placeholder.com/210x295?text=No+Image'; 
+
+    const img = episode.image
+      ? episode.image.medium
+      : 'https://via.placeholder.com/210x295?text=No+Image';
 
     episodeCard.innerHTML = `
       <h2>${seasonAndEpisode} - ${episode.name}</h2>
@@ -112,29 +149,26 @@ function makePageForEpisodes(episodeList, rootElement){
     `;
     rootElement.appendChild(episodeCard);
   });
-
 }
 
 /**
  *  COUNT FEATURE
  */
 function updateCount(displayed, total, countElement) {
-  if(countElement) {
+  if (countElement) {
     countElement.textContent = `Showing: ${displayed} / ${total} episode(s)`;
   }
 }
 
-function populateShowSelector(shows, selectorElement){
+function populateShowSelector(shows, selectorElement) {
   selectorElement.innerHTML = '<option value="0">Select a show</option>';
   shows.sort((a, b) => a.name.localeCompare(b.name));
 
   shows.forEach((show) => {
     const option = new Option(show.name, show.id);
     selectorElement.add(option);
-
   });
 }
-
 
 function populateEpisodeSelector(episodes, selectorElement) {
   selectorElement.innerHTML = '<option value="0">All Episodes</option>';
@@ -150,6 +184,5 @@ function transformSeasonAndEpisodeNum(episode) {
   const paddedEpisode = episode.number.toString().padStart(2, '0');
   return `S${paddedSeason}E${paddedEpisode}`;
 }
-
 
 window.onload = setup;
