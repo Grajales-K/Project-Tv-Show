@@ -74,7 +74,6 @@ async function fetchAllShows(){
   }
 }
 
-
 async function fetchEpisodes(showId){
   try {
     const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
@@ -86,6 +85,34 @@ async function fetchEpisodes(showId){
   }
   
 }
+
+
+/**
+ *  Rendering Functions
+ */
+function makePageForEpisodes(episodeList, rootElement){
+  rootElement.innerHTML = '';
+  if(episodeList.length === 0) {
+    rootElem.innerHTML = '<p>No episodes found matching your criteria.</p>';
+  }
+  episodeList.forEach((episode) =>  {
+    const seasonAndEpisode = transformSeasonAndEpisodeNum(episode);
+    const episodeCard = document.createElement('section');
+    episodeCard.classList.add('episode-card');
+    
+    const img = episode.image ? episode.image.medium : 'https://via.placeholder.com/210x295?text=No+Image'; 
+
+    episodeCard.innerHTML = `
+      <h2>${seasonAndEpisode} - ${episode.name}</h2>
+      <img src="${img}" alt="${episode.name}">
+      <div class="summary">${episode.summary || 'No summary available.'}</div>
+    `;
+    rootElement.appendChild(episodeCard);
+  });
+
+}
+
+
 
 
 
@@ -155,31 +182,7 @@ function setupSelectorFeature(
   };
 }
 
-/**
- * 4. RENDERING
- * Responsible for creating the HTML "cards" for the episodes.
- */
-function makePageForEpisodes(episodeList, rootElem) {
-  rootElem.innerHTML = ''; // Clear current episodes
 
-  episodeList.forEach((episode) => {
-    const seasonAndEpisode = transformSeasonAndEpisodeNum(episode);
-    const titleText = `${seasonAndEpisode} - ${episode.name}`;
-
-    const episodeCard = document.createElement('section');
-    episodeCard.className = 'episode-card';
-
-    episodeCard.innerHTML = `
-      <h2>${titleText}</h2>
-      <img src="${episode.image ? episode.image.medium : ''}" alt="${
-      episode.name
-    }">
-      ${episode.summary}
-    `;
-
-    rootElem.appendChild(episodeCard);
-  });
-}
 
 /**
  * 5. HELPERS
