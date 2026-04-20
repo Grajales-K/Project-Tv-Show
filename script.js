@@ -112,6 +112,25 @@ function makePageForEpisodes(episodeList, rootElement){
 
 }
 
+/**
+ *  COUNT FEATURE
+ */
+function updateCount(displayed, total, countElement) {
+  if(countElement) {
+    countElement.textContent = `Showing: ${displayed} / ${total} episode(s)`;
+  }
+}
+
+function populateShowSelector(shows, selectorElement){
+  selectorElement.innerHTML = '<option value="0">Select a show</option>';
+  shows.sort((a, b) => a.name.localeCompare(b.name));
+
+  shows.forEach((show) => {
+    const option = new Option(show.name, show.id);
+    selectorElement.add(option);
+
+  });
+}
 
 
 
@@ -182,33 +201,6 @@ function setupSelectorFeature(
   };
 }
 
-
-
-/**
- * 5. HELPERS
- * Small utility functions to keep the main logic readable.
- */
-
-// Updates the "Showing X/Y" text
-function updateCount(displayed, total, countElement) {
-  if (countElement) {
-    countElement.textContent = `Showing: ${displayed} / ${total} episode(s)`;
-  }
-}
-//Populate the <select> shows with options by ANGELA
-function populateShowSelector(shows, selectorElement) {
-  selectorElement.innerHTML = '<option value="0">Select a show</option>';
-
-  // sort a-z
-  shows.sort((a, b) => a.name.localeCompare(b.name));
-
-  shows.forEach((show) => {
-    const option = document.createElement('option');
-    option.value = show.id;
-    option.textContent = show.name;
-    selectorElement.appendChild(option);
-  });
-}
 
 // Populates the <select> element with options
 function populateEpisodeSelector(episodes, selectorElement) {
