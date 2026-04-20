@@ -19,56 +19,41 @@ async function setup() {
 
  
   searchInput.addEventListener('input', () => {
-    const filtered = filteredEpisodes(allEpisodes, searchInput.value);
+    const query = searchInput.value.toLowerCase();
+    const filtered = allEpisodes.filter(episode => episode.name.toLowerCase().includes(query) ||
+      (allEpisodes.summary && allEpisodes.summary.toLowerCase().includes(query))
+    )
     makePageForEpisodes(filtered, rootElem);
     updateCount(filtered.length, allEpisodes.length, countElement);
   })
-
+  
   showSelector.addEventListener('change', async (event) => {
     const showId = e.target.value;
-    if (showId > 0 ){
-      allEpisodes = await fetchEpisodes(showID);
+    if(showId === '0') return;
+
+  rootElem.innerHTML = "<p>Loading episodes...</p>";
+  searchInput.value = ""; // Clear search input on show change
+
+
+  allEpisodes = await fetchEpisodes(showId);
+
+  populateEpisodeSelector(allEpisodes, episodeSelector);
+  makePageForEpisodes(allEpisodes, rootElem);
+  updateCount(allEpisodes.length, allEpisodes.length, countElement);
+  });
+
+  episodeSelector.addEventListener('change', (event) => {
+    const selectedId = parseInt(event.target.value);
+    if(selectedId === 0) {
       makePageForEpisodes(allEpisodes, rootElem);
       updateCount(allEpisodes.length, allEpisodes.length, countElement);
+    }else {
+      const single = allEpisodes.filter((episode) => episode.id === selectedId);
+      makePageForEpisodes(single, rootElem);  
+      updateCount(1, allEpisodes.length, countElement);
     }
   });
-
-  rootElem.innerHTML = '<p>Select a show to begin...</p>';
-
-
-  // // populate the show dropdown menu
-  // populateShowSelector(allShows, showSelector);
-  // setupShowSelector(
-  //   showSelector,
-  //   rootElem,
-  //   searchInput,
-  //   episodeSelector,
-  //   countElement
-  // );
 }
-
-function setupShowSelector(
-  showSelector,
-  rootElem,
-  searchInput,
-  episodeSelector,
-  countElement
-) {
-  showSelector.addEventListener('change', (event) => {
-    const showId = parseInt(event.target.value, 10);
-
-    if (!showId) return;
-
-    loadEpisodesForShow(
-      showId,
-      rootElem,
-      searchInput,
-      episodeSelector,
-      countElement
-    );
-  });
-}
-
 //fetch all shows by ANGELA
 async function fetchAllShows() {
   const url = 'https://api.tvmaze.com/shows';
@@ -263,6 +248,6 @@ window.onload = setup;
 
 
 
-//
+
 
 
