@@ -1,4 +1,4 @@
-let allEpisodes;
+let allEpisodes [];
 
 /**
  * 1. orchestration
@@ -15,7 +15,7 @@ async function setup() {
   // load all shows and populate the show dropdown
   const allShows = await fetchAllShows();
   populateShowSelector(allShows, showSelector);
-  rootElem.innerHTML = '<p>Select a show to begin...</p>';
+  rootElem.innerHTML = '<p>Select All Shows or One Show to begin...</p>';
 
  
   searchInput.addEventListener('input', () => {
@@ -29,21 +29,25 @@ async function setup() {
   
   showSelector.addEventListener('change', async (event) => {
     const showId = e.target.value;
-    if(showId === '0') return;
+    if (showId === '0') {
+      rootElem.innerHTML = '<p>Select a show to begin...</p>';
+      return;
+    }
 
-  rootElem.innerHTML = "<p>Loading episodes...</p>";
-  searchInput.value = ""; // Clear search input on show change
+    rootElem.innerHTML = "<p>Loading episodes...</p>";
+    searchInput.value = ""; // Clear search input on show change
 
 
-  allEpisodes = await fetchEpisodes(showId);
+    allEpisodes = await fetchEpisodes(showId);
 
-  populateEpisodeSelector(allEpisodes, episodeSelector);
-  makePageForEpisodes(allEpisodes, rootElem);
-  updateCount(allEpisodes.length, allEpisodes.length, countElement);
+    populateEpisodeSelector(allEpisodes, episodeSelector);
+    makePageForEpisodes(allEpisodes, rootElem);
+    updateCount(allEpisodes.length, allEpisodes.length, countElement);
   });
 
   episodeSelector.addEventListener('change', (event) => {
     const selectedId = parseInt(event.target.value);
+
     if(selectedId === 0) {
       makePageForEpisodes(allEpisodes, rootElem);
       updateCount(allEpisodes.length, allEpisodes.length, countElement);
@@ -54,19 +58,36 @@ async function setup() {
     }
   });
 }
-//fetch all shows by ANGELA
-async function fetchAllShows() {
-  const url = 'https://api.tvmaze.com/shows';
 
-  try {
-    const response = await fetch(url);
-    const allShows = await response.json();
-    return allShows;
-  } catch (error) {
-    console.error('Error fetching shows:', error);
+/**
+ *  Data Functions (API)
+ */
+
+async function fetchAllShows(){
+  try{
+    const response = await fetch('https://api.tvmaze.com/shows');
+    if(!response.ok) throw new Error("Network response was not ok, please try again");
+    return await response.json(); 
+  }catch(error){
+    console.error('error fetching shows:', error);
     return [];
   }
 }
+
+
+async function fetchEpisodes(showId){
+  try {
+    const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
+    if (!response.ok) throw new Error("Network response did not downloaded episodes, please try again");
+    return await response.json();
+  }catch(error) {
+    console.error('Error fetching episodes:', error);
+    return []; 
+  }
+  
+}
+
+
 
 /**
  * 2. SEARCH FEATURE
