@@ -1,4 +1,5 @@
 let allEpisodes = [];
+let allShows = [];
 
 /**
  * 1. orchestration
@@ -31,13 +32,28 @@ async function setup() {
   showSelector.addEventListener('change', async (event) => {
     const showId = event.target.value;
 
+    //option Clean State, option to see gallery view or select a single show
     if (showId === '0') {
-      rootElem.innerHTML = '<p>Select a show to begin...</p>';
+      rootElem.innerHTML =
+        '<p>Select All Shows (Gallery) or One Show to begin...</p>';
+      updateCount(0, 0, countElement);
+      episodeSelector.classList.add('hidden');
+      return;
+    }
+
+    //if user select gallery option, show all shows in gallery view
+    if (showId === 'gallery') {
+      rootElem.innerHTML = "<p class='loading>Loading Gallery view...</p>";
+      episodeSelector.classList.add('hidden');
+
+      makePageForShows(allShows, rootElem);
+      updateCount(allShows.length, allShows.length, countElement);
       return;
     }
 
     rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
-    searchInput.value = ''; // Clear search input on show change
+
+    episodeSelector.classList.remove('hidden');
 
     allEpisodes = await fetchEpisodes(showId);
 
@@ -112,15 +128,19 @@ function makePageForShows(showList, rootElement) {
       <img src="${img}" alt="${show.name}"> 
 
       <div class="show-info">  
-        <strong>${genres}</strong> | ⭐ ${show.rating.average || 'N/A'}
+        <p><strong>Genres:</strong> ${genres}</p>
+        <p><strong>Rating:</strong> ⭐ ${show.rating.average || 'N/A'}</p>
       </div>
 
       <div class="summary">
-      ${show.summary || 'no summary avaliable.'}  
+      Summary: ${show.summary || 'no summary avaliable.'}  
       </div>
 
-      <div class="show-footer">
-        <span> Status: ${show.status}</span> | <span>${show.runtime}</span>
+      <div class="show-info">
+        <div class="meta-item"><strong>Status:</strong> ${show.status}</div>
+        <div class="meta-item"><strong>Runtime:</strong> ${
+          show.runtime
+        } mins</div>
       </div> `;
     rootElement.appendChild(showCard);
   });
@@ -161,7 +181,9 @@ function updateCount(displayed, total, countElement) {
 }
 
 function populateShowSelector(shows, selectorElement) {
-  selectorElement.innerHTML = '<option value="0">Select a show</option>';
+  selectorElement.innerHTML = `
+                            <option value="0">Select a show</option>';
+                            <option value = "gallery">🖼️ Gallery (All Shows)</option>`;
   shows.sort((a, b) => a.name.localeCompare(b.name));
 
   shows.forEach((show) => {
