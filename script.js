@@ -14,19 +14,36 @@ async function setup() {
   const showSelector = document.getElementById('showSelector');
 
   // load all shows and populate the show dropdown
-  const allShows = await fetchAllShows();
+  allShows = await fetchAllShows();
   populateShowSelector(allShows, showSelector);
   rootElem.innerHTML = '<p>Select All Shows or One Show to begin...</p>';
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
-    const filtered = allEpisodes.filter(
-      (episode) =>
-        episode.name.toLowerCase().includes(query) ||
-        (allEpisode.summary && allEpisode.summary.toLowerCase().includes(query))
-    );
-    makePageForEpisodes(filtered, rootElem);
-    updateCount(filtered.length, allEpisodes.length, countElement);
+    const showSelector = document.getElementById('showSelector');
+    const rootElem = document.getElementById('content-grid');
+
+    const isGalleryMode =
+      showSelector.value === 'gallery' || showSelector.value === '0';
+
+    if (isGalleryMode) {
+      const filteredShows = allShows.filter(
+        (show) =>
+          show.name.toLowerCase().includes(query) ||
+          show.genres.some((g) => g.toLowerCase().includes(query)) ||
+          (show.summary && show.summary.toLowerCase().includes(query))
+      );
+      makePageForShows(filteredShows, rootElem);
+      updateCount(filteredShows.length, allShows.length, countElement);
+    } else {
+      const filteredEpisodes = allEpisodes.filter(
+        (episode) =>
+          episode.name.toLowerCase().includes(query) ||
+          (episode.summary && episode.summary.toLowerCase().includes(query))
+      );
+      makePageForEpisodes(filteredEpisodes, rootElem);
+      updateCount(filteredEpisodes.length, allEpisodes.length, countElement);
+    }
   });
 
   showSelector.addEventListener('change', async (event) => {
