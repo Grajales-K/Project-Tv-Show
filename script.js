@@ -16,7 +16,13 @@ async function setup() {
   // load all shows and populate the show dropdown
   allShows = await fetchAllShows();
   populateShowSelector(allShows, showSelector);
-  rootElem.innerHTML = '<p>Select All Shows or One Show to begin...</p>';
+  rootElem.innerHTML =
+    // '<p>Select Gallery (All Shows) or pick one Show to begin...</p>';
+    `<div class="welcome-container">
+      <h2 class="welcome-title">Welcome to the TV World</h2>
+      <p class="welcome-text">Select <strong>Gallery (All Shows)</strong> or pick one <strong>Show</strong> from the menu above to begin your journey...</p>
+      <div class="welcome-icon">📺</div>
+    </div> `;
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();

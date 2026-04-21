@@ -51,6 +51,44 @@ body {
   display: inline-block;
 }
 
+/* --- welcome message Clear state --- */
+.welcome-container {
+  grid-column: 1 / -1;   
+  text-align: center;
+  padding: 100px 20px;    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  animation: fadeIn 0.8s ease-in; 
+}
+
+.welcome-title {
+  font-size: 2rem;     
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.welcome-text {
+  font-size: 1.2rem;      
+  color: var(--text-light);
+  max-width: 600px;       
+}
+
+.welcome-icon {
+  font-size: 3rem;       
+  margin-top: 15px;
+  opacity: 0.3;
+}
+
+/* animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- Controls Container --- */
 .controls-container {
   display: flex;
@@ -211,11 +249,35 @@ body {
 }
 
 /* --- Footer --- */
+
 .main-footer {
+  background-color: var(--nav-bg); 
+  color: #ffffff; 
   text-align: center;
-  padding: 2rem;
-  background-color: #eee;
+  padding: 2.5rem 1rem;
   margin-top: 4rem;
+  border-top: 4px solid var(--accent-color);
+}
+
+.main-footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.main-footer a {
+  color: #ffffff !important; 
+  text-decoration: none;     
+  font-weight: 700;
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+  transition: all 0.3s ease;
+}
+
+
+.main-footer a:hover {
+  color: var(--accent-color) !important;       
+  border-bottom: 1px solid var(--accent-color); 
+  background-color: rgba(255, 255, 255, 0.05); 
+  border-radius: 2px;
 }
 
 /* --- Mobile Responsive --- */
