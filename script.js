@@ -1,5 +1,6 @@
 let allEpisodes = [];
 let allShows = [];
+const dataCache = {};
 
 /**
  * 1. orchestration
@@ -12,25 +13,27 @@ async function setup() {
   const episodeSelector = document.getElementById('episodeSelector');
   const countElement = document.getElementById('episodeCount');
   const showSelector = document.getElementById('showSelector');
+  const episodeGroup = document.getElementById('episode-filter-group');
+
+  // Initial UI State
+  episodeGroup.style.display = 'none'; 
+  countElement.style.display = 'inline-block';
 
   // load all shows and populate the show dropdown
   allShows = await fetchAllShows();
   populateShowSelector(allShows, showSelector);
-  rootElem.innerHTML =
-    // '<p>Select Gallery (All Shows) or pick one Show to begin...</p>';
-    `<div class="welcome-container">
-      <h2 class="welcome-title">Welcome to the TV World</h2>
-      <p class="welcome-text">Select <strong>Gallery (All Shows)</strong> or pick one <strong>Show</strong> from the menu above to begin your journey...</p>
+
+  rootElem.innerHTML = `<div class="welcome-container">
+      <h2 class="welcome-title">Welcome to the TV Show Explorer</h2>
+      <p class="welcome-text">Select <strong>Gallery (All Shows)</strong> 
+      or pick one <strong>Show</strong> from the menu above to begin your journey...</p>
       <div class="welcome-icon">📺</div>
     </div> `;
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
-    const showSelector = document.getElementById('showSelector');
-    const rootElem = document.getElementById('content-grid');
-
     const isGalleryMode =
-      showSelector.value === 'gallery' || showSelector.value === '0';
+      document.getElementById('hide-shows').style.display !== 'none'; 
 
     if (isGalleryMode) {
       const filteredShows = allShows.filter(
@@ -56,33 +59,25 @@ async function setup() {
     const showId = event.target.value;
 
     //option Clean State, option to see gallery view or select a single show
-    if (showId === '0') {
+    if (showId === '0'||  || showId === '') {
+      if (titleContainer) titleContainer.innerHTML = '';
       rootElem.innerHTML =
-        '<p>Select All Shows (Gallery) or One Show to begin...</p>';
+        '<p>Select Gallery (All Shows) or One Show to begin...</p>';
       updateCount(0, 0, countElement);
-      episodeSelector.classList.add('hidden');
       return;
     }
 
     //if user select gallery option, show all shows in gallery view
     if (showId === 'gallery') {
+      if (titleContainer) titleContainer.innerHTML = '';
       rootElem.innerHTML = "<p class='loading>Loading Gallery view...</p>";
-      episodeSelector.classList.add('hidden');
 
       makePageForShows(allShows, rootElem);
       updateCount(allShows.length, allShows.length, countElement);
       return;
     }
 
-    rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
-
-    episodeSelector.classList.remove('hidden');
-
-    allEpisodes = await fetchEpisodes(showId);
-
-    populateEpisodeSelector(allEpisodes, episodeSelector);
-    makePageForEpisodes(allEpisodes, rootElem);
-    updateCount(allEpisodes.length, allEpisodes.length, countElement);
+    await loadEpisodesForShow(showId);
   });
 
   episodeSelector.addEventListener('change', (event) => {
@@ -100,7 +95,7 @@ async function setup() {
 }
 
 /**
- *  Data Functions (API)
+ *  Data Functions API  & Cache
  */
 
 async function fetchAllShows() {
@@ -116,6 +111,10 @@ async function fetchAllShows() {
 }
 
 async function fetchEpisodes(showId) {
+  if (dataCache[showId]) {
+    console.log('loading from cache...');
+    return dataCache[showId];
+  }
   try {
     const response = await fetch(
       `https://api.tvmaze.com/shows/${showId}/episodes`
@@ -124,7 +123,8 @@ async function fetchEpisodes(showId) {
       throw new Error(
         'Network response did not downloaded episodes, please try again'
       );
-    return await response.json();
+    dataCache[showId] = data;
+    return data;
   } catch (error) {
     console.error('Error fetching episodes:', error);
     return [];
@@ -141,13 +141,6 @@ function makePageForShows(showList, rootElement) {
     const showCard = document.createElement('section');
     showCard.classList.add('episode-card');
 
-    // //make the entire show card name clickable 
-    // const title = showCard.querySelector('h2');
-    // title.style.cursor = 'pointer';
-    // title.addEventListener('click', () => {
-    //   loadEpisodesForShow(show.id);
-    // });
-    
     const img = show.image
       ? show.image.medium
       : 'https://via.placeholder.com/210x295?text=No+Image';
@@ -155,9 +148,9 @@ function makePageForShows(showList, rootElement) {
 
     showCard.innerHTML = `
       <h2 class="clickable-title">${show.name}</h2>
-      <img src="${img}" alt="${show.name}" class="clickable-img"> 
+      <img src="${img}" alt="${show.name}" class="clickable-img">
 
-      <div class="show-info">  
+      <div class="show-info">
         <p><strong>Genres:</strong> ${genres}</p>
         <p><strong>Rating:</strong> ⭐ ${show.rating.average || 'N/A'}</p>
         <p><strong>Status:</strong> ${show.status}</p>
@@ -169,20 +162,19 @@ function makePageForShows(showList, rootElement) {
         ${show.summary || 'no summary available.'}
       </div>`;
 
-      //added class to make clickable the title and image for each show
-      const title = showCard.querySelector('.clickable-title');
-      const imageClick = showCard.querySelector('.clickable-img');
+    //added class to make clickable the title and image for each show
+    const title = showCard.querySelector('.clickable-title');
+    const imageClick = showCard.querySelector('.clickable-img');
 
-      const goToEpisodes = async () => {
-        const showSelector = document.getElementById('showSelector');
-        showSelector.value = show.id; 
-        await loadEpisodesForShow(show.id); 
-      };
+    const goToEpisodes = async () => {
+      const showSelector = document.getElementById('showSelector');
+      showSelector.value = show.id;
+      await loadEpisodesForShow(show.id);
+    };
 
-      //added event listener for both 
-      title.addEventListener('click', goToEpisodes);
-      imageClick.addEventListener('click', goToEpisodes);
-
+    //added event listener for both
+    title.addEventListener('click', goToEpisodes);
+    imageClick.addEventListener('click', goToEpisodes);
 
     rootElement.appendChild(showCard);
   });
@@ -247,6 +239,42 @@ function transformSeasonAndEpisodeNum(episode) {
   const paddedSeason = episode.season.toString().padStart(2, '0');
   const paddedEpisode = episode.number.toString().padStart(2, '0');
   return `S${paddedSeason}E${paddedEpisode}`;
+}
+
+async function loadEpisodesForShow(showId) {
+  const rootElem = document.getElementById('content-grid');
+  const episodeSelector = document.getElementById('episodeSelector');
+  const showSelector = document.getElementById('showSelector');
+  const searchInput = document.getElementById('searchInput');
+  const countElement = document.getElementById('episodeCount');
+
+  searchInput.value = '';
+  rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
+
+  showSelector.style.display = 'none';
+  episodeSelector.style.display = 'inline-block';
+
+  allEpisodes = await fetchEpisodes(showId);
+
+  populateEpisodeSelector(allEpisodes, episodeSelector);
+  makePageForEpisodes(allEpisodes, rootElem);
+  updateCount(
+    allEpisodes.length,
+    allEpisodes.length,
+    document.getElementById('episodeCount')
+  );
+
+  renderBackButton();
+}
+
+function showDropVisible(status) {
+  const showSelector = document.getElementById('showSelector');
+  showSelector.style.display = status ? 'block' : 'none';
+}
+
+function episodeDropVisible(status) {
+  const episodeSelector = document.getElementById('episodeSelector');
+  episodeSelector.style.display = status ? 'block' : 'none';
 }
 
 window.onload = setup;
