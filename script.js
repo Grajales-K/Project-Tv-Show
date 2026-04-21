@@ -141,14 +141,21 @@ function makePageForShows(showList, rootElement) {
     const showCard = document.createElement('section');
     showCard.classList.add('episode-card');
 
+    // //make the entire show card name clickable 
+    // const title = showCard.querySelector('h2');
+    // title.style.cursor = 'pointer';
+    // title.addEventListener('click', () => {
+    //   loadEpisodesForShow(show.id);
+    // });
+    
     const img = show.image
       ? show.image.medium
       : 'https://via.placeholder.com/210x295?text=No+Image';
     const genres = show.genres ? show.genres.join(', ') : 'No genres available';
 
     showCard.innerHTML = `
-      <h2>${show.name}</h2>
-      <img src="${img}" alt="${show.name}"> 
+      <h2 class="clickable-title">${show.name}</h2>
+      <img src="${img}" alt="${show.name}" class="clickable-img"> 
 
       <div class="show-info">  
         <p><strong>Genres:</strong> ${genres}</p>
@@ -161,6 +168,22 @@ function makePageForShows(showList, rootElement) {
         <h3>Summary</h3>
         ${show.summary || 'no summary available.'}
       </div>`;
+
+      //added class to make clickable the title and image for each show
+      const title = showCard.querySelector('.clickable-title');
+      const imageClick = showCard.querySelector('.clickable-img');
+
+      const goToEpisodes = async () => {
+        const showSelector = document.getElementById('showSelector');
+        showSelector.value = show.id; 
+        await loadEpisodesForShow(show.id); 
+      };
+
+      //added event listener for both 
+      title.addEventListener('click', goToEpisodes);
+      imageClick.addEventListener('click', goToEpisodes);
+
+
     rootElement.appendChild(showCard);
   });
 }
