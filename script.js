@@ -116,7 +116,7 @@ function makePageForShows(showList, rootElement) {
 
   showList.forEach((show) => {
     const showCard = document.createElement('section');
-    showCard.classList.add('show-card');
+    showCard.classList.add('episode-card');
 
     const img = show.image
       ? show.image.medium
@@ -130,18 +130,14 @@ function makePageForShows(showList, rootElement) {
       <div class="show-info">  
         <p><strong>Genres:</strong> ${genres}</p>
         <p><strong>Rating:</strong> ⭐ ${show.rating.average || 'N/A'}</p>
+        <p><strong>Status:</strong> ${show.status}</p>
+        <p><strong>Runtime:</strong> ${show.runtime} mins</p>
       </div>
 
       <div class="summary">
-      Summary: ${show.summary || 'no summary avaliable.'}  
-      </div>
-
-      <div class="show-info">
-        <div class="meta-item"><strong>Status:</strong> ${show.status}</div>
-        <div class="meta-item"><strong>Runtime:</strong> ${
-          show.runtime
-        } mins</div>
-      </div> `;
+        <h3>Summary</h3>
+        ${show.summary || 'no summary available.'}
+      </div>`;
     rootElement.appendChild(showCard);
   });
 }
