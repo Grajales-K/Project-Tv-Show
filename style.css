@@ -201,6 +201,26 @@ body {
   line-height: 1.5;
 }
 
+/* clickable title and image for each show */
+.clickable-title, 
+.clickable-img {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+.clickable-title:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+  transform: scale(1.02);
+}
+
+
+.clickable-img:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+}
+
 
 /* --- Episode Card (The "Floating" effect) --- */
 .episode-card {
@@ -212,7 +232,7 @@ body {
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  height: 100%; /* Ensures all cards in a row have the same height */
+  height: 100%; 
   box-sizing: border-box;
   min-height: 600px;
 }
