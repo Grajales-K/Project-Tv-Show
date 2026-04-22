@@ -44,11 +44,44 @@ body {
 
 #episodeCount {
   margin-top: 2px;
-  font-size: 0.8rem; 
+  font-size: 1rem; 
   background: rgba(255, 255, 255, 0.15);
   padding: 1px 10px;
   border-radius: 20px;
   display: inline-block;
+}
+
+/* --- UI Helpers --- */
+/* pop up message errors */
+.no-results, .loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.3rem;
+  color: var(--text-light);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* back button (Header) */
+.back-button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 15px;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.back-button:hover {
+  background-color: #c0392b; /* Un tono más oscuro del accent */
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* --- welcome message Clear state --- */
@@ -64,12 +97,21 @@ body {
   animation: fadeIn 0.8s ease-in; 
 }
 
-.welcome-title {
-  font-size: 2rem;     
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: var(--primary-color);
+
+.hidden {
+  display: none;
 }
+
+/* title for shows */
+.welcome-title {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
 
 .welcome-text {
   font-size: 1.2rem;      
@@ -145,6 +187,12 @@ body {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1.5rem;
+}
+
+#show-title-container{
+  text-align: center; 
+  width: 100%; 
+  margin-bottom: 20px;
 }
 
 .grid-layout {
@@ -320,3 +368,8 @@ body {
     font-size: 1.4rem;    
   }
 }
+
+
+
+
+
