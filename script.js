@@ -16,7 +16,7 @@ async function setup() {
   const episodeGroup = document.getElementById('episode-filter-group');
 
   // Initial UI State
-  episodeGroup.style.display = 'none'; 
+  episodeGroup.style.display = 'none';
   countElement.style.display = 'inline-block';
 
   // load all shows and populate the show dropdown
@@ -33,7 +33,7 @@ async function setup() {
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
     const isGalleryMode =
-      document.getElementById('hide-shows').style.display !== 'none'; 
+      document.getElementById('hide-shows').style.display !== 'none';
 
     if (isGalleryMode) {
       const filteredShows = allShows.filter(
@@ -59,7 +59,7 @@ async function setup() {
     const showId = event.target.value;
 
     //option Clean State, option to see gallery view or select a single show
-    if (showId === '0'||  || showId === '') {
+    if (showId === '0' || showId === '') {
       if (titleContainer) titleContainer.innerHTML = '';
       rootElem.innerHTML =
         '<p>Select Gallery (All Shows) or One Show to begin...</p>';
@@ -111,11 +111,17 @@ async function fetchAllShows() {
 }
 
 async function fetchEpisodes(showId) {
+  const currentShow = allShows.find((show) => show.id == showId);
+  const showName = currentShow ? currentShow.name : showId;
+
   if (dataCache[showId]) {
-    console.log('loading from cache...');
+    console.log('%c 📦 Loading: ${showName} from cache...');
     return dataCache[showId];
   }
+
   try {
+    console.log(
+      `%c [API] 🌐 Downloading: ${showName}...`,);
     const response = await fetch(
       `https://api.tvmaze.com/shows/${showId}/episodes`
     );
@@ -147,7 +153,7 @@ function makePageForShows(showList, rootElement) {
 
     const img = show.image
       ? show.image.medium
-      : "https://static.tvmaze.com/images/no-img/no-img-portrait-text.png";
+      : 'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png';
     const genres = show.genres ? show.genres.join(', ') : 'No genres available';
 
     showCard.innerHTML = `
@@ -198,7 +204,7 @@ function makePageForEpisodes(episodeList, rootElement) {
 
     const img = episode.image
       ? episode.image.medium
-      : "https://static.tvmaze.com/images/no-img/no-img-portrait-text.png";
+      : 'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png';
 
     episodeCard.innerHTML = `
       <h2>${seasonAndEpisode} - ${episode.name}</h2>
