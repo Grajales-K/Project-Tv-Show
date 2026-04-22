@@ -44,11 +44,91 @@ body {
 
 #episodeCount {
   margin-top: 2px;
-  font-size: 0.8rem; 
+  font-size: 1rem; 
   background: rgba(255, 255, 255, 0.15);
   padding: 1px 10px;
   border-radius: 20px;
   display: inline-block;
+}
+
+/* --- UI Helpers --- */
+/* pop up message errors */
+.no-results, .loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.3rem;
+  color: var(--text-light);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* back button (Header) */
+.back-button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 15px;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.back-button:hover {
+  background-color: #c0392b; /* Un tono más oscuro del accent */
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* --- welcome message Clear state --- */
+.welcome-container {
+  grid-column: 1 / -1;   
+  text-align: center;
+  padding: 100px 20px;    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  animation: fadeIn 0.8s ease-in; 
+}
+
+
+.hidden {
+  display: none !important;
+}
+
+/* title for shows */
+.welcome-title {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+
+.welcome-text {
+  font-size: 1.2rem;      
+  color: var(--text-light);
+  max-width: 600px;       
+}
+
+.welcome-icon {
+  font-size: 3rem;       
+  margin-top: 15px;
+  opacity: 0.3;
+}
+
+/* animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Controls Container --- */
@@ -109,24 +189,100 @@ body {
   padding: 0 1.5rem;
 }
 
+#show-title-container{
+  text-align: center; 
+  width: 100%; 
+  margin-bottom: 20px;
+}
+
 .grid-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem; 
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem; 
 }
+
+/* --- Show Card  --- */
+.show-info{ 
+  font-size: 0.8rem; 
+  color: var(--accent-color); 
+  margin-bottom: 5px;
+}
+
+.show-footer{
+  font-size: 0.7rem; 
+  margin-top: auto; 
+  padding-top: 10px; 
+  border-top: 1px solid #eee;
+}
+
+.loading{
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--text-light);
+}
+
+.summary {
+  max-height: 250px; 
+  overflow-y: auto; 
+  padding-right: 8px;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  border-top: 2px solid #eee;
+}
+
+#content-grid .episode-card h2 {
+  width: 100%;          
+  text-align: center;   
+  font-size: 1.5rem;    
+  color: var(--primary-color);
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;   
+  line-height: 1.2;
+  font-weight: 700;
+  display: block;      
+}
+
+.summary p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* clickable title and image for each show */
+.clickable-title, 
+.clickable-img {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+.clickable-title:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+  transform: scale(1.02);
+}
+
+
+.clickable-img:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+}
+
 
 /* --- Episode Card (The "Floating" effect) --- */
 .episode-card {
   background-color: var(--card-bg);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  height: 100%; /* Ensures all cards in a row have the same height */
+  height: 100%; 
   box-sizing: border-box;
+  min-height: 600px;
 }
 
 .episode-card:hover {
@@ -155,17 +311,41 @@ body {
   font-size: 0.9rem;
   color: var(--text-light);
   margin: 0;
-  max-height: 120px;
+  /* max-height: 120px;
   overflow-y: auto;
-  padding-right: 5px;
+  padding-right: 5px; */
 }
 
 /* --- Footer --- */
+
 .main-footer {
+  background-color: var(--nav-bg); 
+  color: #ffffff; 
   text-align: center;
-  padding: 2rem;
-  background-color: #eee;
+  padding: 2.5rem 1rem;
   margin-top: 4rem;
+  border-top: 4px solid var(--accent-color);
+}
+
+.main-footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.main-footer a {
+  color: #ffffff !important; 
+  text-decoration: none;     
+  font-weight: 700;
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+  transition: all 0.3s ease;
+}
+
+
+.main-footer a:hover {
+  color: var(--accent-color) !important;       
+  border-bottom: 1px solid var(--accent-color); 
+  background-color: rgba(255, 255, 255, 0.05); 
+  border-radius: 2px;
 }
 
 /* --- Mobile Responsive --- */
@@ -188,3 +368,8 @@ body {
     font-size: 1.4rem;    
   }
 }
+
+
+
+
+
