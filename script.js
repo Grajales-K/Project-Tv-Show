@@ -147,7 +147,7 @@ function makePageForShows(showList, rootElement) {
 
     const img = show.image
       ? show.image.medium
-      : 'https://via.placeholder.com/210x295?text=No+Image';
+      : "https://static.tvmaze.com/images/no-img/no-img-portrait-text.png";
     const genres = show.genres ? show.genres.join(', ') : 'No genres available';
 
     showCard.innerHTML = `
@@ -198,7 +198,7 @@ function makePageForEpisodes(episodeList, rootElement) {
 
     const img = episode.image
       ? episode.image.medium
-      : 'https://via.placeholder.com/210x295?text=No+Image';
+      : "https://static.tvmaze.com/images/no-img/no-img-portrait-text.png";
 
     episodeCard.innerHTML = `
       <h2>${seasonAndEpisode} - ${episode.name}</h2>
