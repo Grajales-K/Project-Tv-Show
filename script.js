@@ -137,6 +137,10 @@ async function fetchEpisodes(showId) {
 function makePageForShows(showList, rootElement) {
   rootElement.innerHTML = '';
 
+  if (showList.length === 0) {
+    rootElem.innerHTML = '<p>No TV shows found matching your search.</p>';
+  }
+
   showList.forEach((show) => {
     const showCard = document.createElement('section');
     showCard.classList.add('episode-card');
@@ -184,7 +188,7 @@ function makePageForEpisodes(episodeList, rootElement) {
   rootElement.innerHTML = '';
 
   if (episodeList.length === 0) {
-    rootElem.innerHTML = '<p>No episodes found matching your criteria.</p>';
+    rootElem.innerHTML = '<p>No episodes found matching your search.</p>';
   }
 
   episodeList.forEach((episode) => {
