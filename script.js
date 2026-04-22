@@ -120,8 +120,7 @@ async function fetchEpisodes(showId) {
   }
 
   try {
-    console.log(
-      `%c [API] 🌐 Downloading: ${showName}...`,);
+    console.log(`%c [API] 🌐 Downloading: ${showName}...`);
     const response = await fetch(
       `https://api.tvmaze.com/shows/${showId}/episodes`
     );
@@ -129,6 +128,7 @@ async function fetchEpisodes(showId) {
       throw new Error(
         'Network response did not downloaded episodes, please try again'
       );
+    const data = await response.json();
     dataCache[showId] = data;
     return data;
   } catch (error) {
@@ -141,12 +141,14 @@ async function fetchEpisodes(showId) {
  *  Rendering Functions
  */
 function makePageForShows(showList, rootElement) {
-  rootElement.innerHTML = '';
+  const titleContainer = document.getElementById('show-title-container');
+  if (titleContainer) titleContainer.innerHTML = ''; 
 
   if (showList.length === 0) {
     rootElem.innerHTML = '<p>No TV shows found matching your search.</p>';
   }
 
+  rootElement.innerHTML = '';
   showList.forEach((show) => {
     const showCard = document.createElement('section');
     showCard.classList.add('episode-card');
@@ -173,28 +175,38 @@ function makePageForShows(showList, rootElement) {
       </div>`;
 
     //added class to make clickable the title and image for each show
-    const title = showCard.querySelector('.clickable-title');
-    const imageClick = showCard.querySelector('.clickable-img');
-
-    const goToEpisodes = async () => {
-      const showSelector = document.getElementById('showSelector');
-      showSelector.value = show.id;
-      await loadEpisodesForShow(show.id);
-    };
-
-    //added event listener for both
-    title.addEventListener('click', goToEpisodes);
-    imageClick.addEventListener('click', goToEpisodes);
-
+    const trigger = () => loadEpisodesForShow(show.id);
+    showCard.querySelector('.clickable-title').onclick = trigger;
+    showCard.querySelector('.clickable-img').onclick = trigger;
     rootElement.appendChild(showCard);
   });
 }
 
 function makePageForEpisodes(episodeList, rootElement) {
+  const titleContainer = document.getElementById('show-title-container');
   rootElement.innerHTML = '';
 
   if (episodeList.length === 0) {
     rootElem.innerHTML = '<p>No episodes found matching your search.</p>';
+  }
+
+  const currentShowId = document.getElementById('showSelector').value;
+  const currentShow = allShows.find((show) => show.id == currentShowId);
+
+
+  if (titleContainer) {
+    if (currentShow) {
+      titleContainer.innerHTML = `<h1> Show ${currentShow.name}</h1>`;
+    } else {
+      titleContainer.innerHTML = '';
+    }
+  }
+
+  if (episodeList.length === 0) {
+    const noResults = document.createElement('p');
+    noResults.innerText = 'No episodes found matching your criteria.';
+    rootElement.appendChild(noResults);
+    return;
   }
 
   episodeList.forEach((episode) => {
@@ -213,6 +225,35 @@ function makePageForEpisodes(episodeList, rootElement) {
     `;
     rootElement.appendChild(episodeCard);
   });
+}
+
+/**
+ *  Navigation & UI Helpers
+ */
+async function loadEpisodesForShow(showId) {
+  const rootElem = document.getElementById('content-grid');
+  const showGroup = document.getElementById('hide-shows');
+  const episodeGroup = document.getElementById('episode-filter-group');
+  const countElement = document.getElementById('episodeCount');
+
+  document.getElementById('searchInput').value = '';
+  rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
+
+  showGroup.style.display = 'none';
+  episodeGroup.style.display = 'inline-block';
+
+  document.getElementById('showSelector').value = showId;
+
+  allEpisodes = await fetchEpisodes(showId);
+
+  populateEpisodeSelector(
+    allEpisodes,
+    document.getElementById('episodeSelector')
+  );
+  makePageForEpisodes(allEpisodes, rootElem);
+  updateCount(allEpisodes.length, allEpisodes.length, countElement);
+
+  renderBackButton();
 }
 
 /**
@@ -251,31 +292,6 @@ function transformSeasonAndEpisodeNum(episode) {
   return `S${paddedSeason}E${paddedEpisode}`;
 }
 
-async function loadEpisodesForShow(showId) {
-  const rootElem = document.getElementById('content-grid');
-  const episodeSelector = document.getElementById('episodeSelector');
-  const showSelector = document.getElementById('showSelector');
-  const searchInput = document.getElementById('searchInput');
-  const countElement = document.getElementById('episodeCount');
-
-  searchInput.value = '';
-  rootElem.innerHTML = "<p class='loading'>Loading episodes...</p>";
-
-  showSelector.style.display = 'none';
-  episodeSelector.style.display = 'inline-block';
-
-  allEpisodes = await fetchEpisodes(showId);
-
-  populateEpisodeSelector(allEpisodes, episodeSelector);
-  makePageForEpisodes(allEpisodes, rootElem);
-  updateCount(
-    allEpisodes.length,
-    allEpisodes.length,
-    document.getElementById('episodeCount')
-  );
-
-  renderBackButton();
-}
 
 function showDropVisible(status) {
   const showSelector = document.getElementById('showSelector');
